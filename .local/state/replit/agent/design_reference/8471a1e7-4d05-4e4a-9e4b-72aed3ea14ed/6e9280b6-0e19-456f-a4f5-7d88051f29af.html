@@ -1,0 +1,1335 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodewiseHub - Complete Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    'poppins': ['Poppins', 'sans-serif']
+                },
+                colors: {
+                    'student': '#ff9a9e',
+                    'teacher': '#a8edea', 
+                    'parent': '#764ba2'
+                }
+            }
+        }
+    };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .student-gradient {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+        
+        .teacher-gradient {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        .parent-gradient {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        .bounce-animation {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .course-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-selector {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-selector:hover {
+            transform: scale(1.05);
+        }
+        
+        .blockly-container, .monaco-container {
+            height: 400px;
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        
+        .microbit-simulator {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+        }
+        
+        .led-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin: 20px 0;
+        }
+        
+        .led {
+            width: 20px;
+            height: 20px;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .led.active {
+            background: #f56565;
+            box-shadow: 0 0 10px #f56565;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .hidden { display: none; }
+        .show { display: block; }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show { transform: translateX(0); }
+        .notification.success { background: #10b981; }
+        .notification.error { background: #ef4444; }
+        .notification.info { background: #3b82f6; }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .age-selector {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .age-selector:hover {
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+        
+        .achievement-badge.earned {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .editor-tabs {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .editor-tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .editor-tab.active {
+            background: white;
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-poppins">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-800">CodewiseHub</span>
+                    </div>
+                </div>
+                
+                <!-- Public Navigation -->
+                <div id="publicNav" class="flex items-center space-x-4">
+                    <a href="#home" class="text-gray-700 hover:text-blue-600 px-3 py-2 font-medium">Home</a>
+                    <a href="#courses" class="text-gray-700 hover:text-blue-600 px-3 py-2 font-medium">Courses</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-blue-600 px-3 py-2 font-medium">Pricing</a>
+                    <button onclick="openAuthModal('signup')" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">
+                        <i class="fas fa-rocket mr-2"></i>Sign Up Free
+                    </button>
+                    <button onclick="openAuthModal('signin')" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                        Sign In
+                    </button>
+                </div>
+                
+                <!-- Authenticated Navigation -->
+                <div id="authNav" class="hidden flex items-center space-x-4">
+                    <button id="codingLabBtn" class="hidden bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600 transition">
+                        <i class="fas fa-laptop-code mr-2"></i>Coding Lab
+                    </button>
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span id="userNameDisplay">User</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <button onclick="signOut()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Content -->
+    <div id="homeContent">
+        <!-- Hero Section -->
+        <section id="home" class="gradient-bg py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                        Explore. Learn. Code.
+                        <span class="block text-yellow-300">Together!</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto">
+                        Dive into fun, interactive coding adventures designed for young minds. 
+                        Build amazing projects, learn with AI, and become a coding hero!
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="openAuthModal('signup')" class="bg-yellow-400 text-purple-800 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition bounce-animation">
+                            <i class="fas fa-rocket mr-2"></i>Start Learning Now - FREE!
+                        </button>
+                        <button onclick="scrollToSection('courses')" class="bg-white text-purple-800 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition">
+                            <i class="fas fa-play mr-2"></i>Explore Courses
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Age Selection -->
+        <section id="courses" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Choose Your Learning Path!</h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Select your age group to discover learning experiences designed just for you
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <!-- Little Coders (6-11) -->
+                    <div class="age-selector student-gradient p-8 rounded-2xl shadow-lg text-center">
+                        <div class="text-6xl mb-4">🎓</div>
+                        <h3 class="text-2xl font-bold text-purple-800 mb-4">Little Coders</h3>
+                        <p class="text-purple-700 mb-4">Ages 6-11</p>
+                        <div class="text-sm text-purple-600 mb-6">
+                            <i class="fas fa-puzzle-piece mr-2"></i>Visual Block Programming<br>
+                            <i class="fas fa-robot mr-2"></i>Robotics & Animations<br>
+                            <i class="fas fa-microchip mr-2"></i>Micro:bit Adventures<br>
+                            <i class="fas fa-gamepad mr-2"></i>Game Creation
+                        </div>
+                        <button onclick="openAuthModal('signup', 'student', '6-11')" class="bg-white text-purple-800 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                            Start Adventure
+                        </button>
+                    </div>
+
+                    <!-- Teen Coders (12-17) -->
+                    <div class="age-selector teacher-gradient p-8 rounded-2xl shadow-lg text-center">
+                        <div class="text-6xl mb-4">💻</div>
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Teen Coders</h3>
+                        <p class="text-blue-700 mb-4">Ages 12-17</p>
+                        <div class="text-sm text-blue-600 mb-6">
+                            <i class="fas fa-code mr-2"></i>Python & JavaScript<br>
+                            <i class="fas fa-globe mr-2"></i>Web Development<br>
+                            <i class="fas fa-mobile-alt mr-2"></i>App Development<br>
+                            <i class="fas fa-brain mr-2"></i>AI & Machine Learning
+                        </div>
+                        <button onclick="openAuthModal('signup', 'student', '12-17')" class="bg-white text-blue-800 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                            Start Coding
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Role Selection for Teachers/Parents -->
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
+                    <!-- Teachers -->
+                    <div class="role-selector teacher-gradient p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-4xl mb-3">👩‍🏫</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Educators</h3>
+                        <p class="text-gray-600 mb-4">Manage students and create courses</p>
+                        <button onclick="openAuthModal('signup', 'teacher')" class="bg-white text-gray-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+                            Join as Teacher
+                        </button>
+                    </div>
+
+                    <!-- Parents -->
+                    <div class="role-selector parent-gradient p-6 rounded-xl shadow-lg text-center">
+                        <div class="text-4xl mb-3">👨‍👩‍👧‍👦</div>
+                        <h3 class="text-xl font-bold text-white mb-2">Parents</h3>
+                        <p class="text-gray-100 mb-4">Track your child's progress</p>
+                        <button onclick="openAuthModal('signup', 'parent')" class="bg-white text-gray-800 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+                            Join as Parent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Simple, Affordable Pricing</h2>
+                    <p class="text-lg text-gray-600">Start free and upgrade as you grow</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Free Plan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Free Explorer</h3>
+                        <div class="text-4xl font-bold text-green-600 mb-4">R0</div>
+                        <p class="text-gray-600 mb-6">Perfect for getting started</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>5 Coding Lessons</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Basic Projects</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Community Support</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Progress Tracking</li>
+                        </ul>
+                        <button onclick="openAuthModal('signup')" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition">
+                            Start Free
+                        </button>
+                    </div>
+
+                    <!-- Basic Plan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-blue-500 relative">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                            Most Popular
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Basic Coder</h3>
+                        <div class="text-4xl font-bold text-blue-600 mb-4">R349<span class="text-lg">/month</span></div>
+                        <p class="text-gray-600 mb-6">For serious young coders</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Unlimited Lessons</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Advanced Projects</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>AI Tutor Access</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Certificates</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Parent Reports</li>
+                        </ul>
+                        <button class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition">
+                            Choose Basic
+                        </button>
+                    </div>
+
+                    <!-- Premium Plan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Premium Pro</h3>
+                        <div class="text-4xl font-bold text-purple-600 mb-4">R699<span class="text-lg">/month</span></div>
+                        <p class="text-gray-600 mb-6">Complete learning experience</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li><i class="fas fa-check text-purple-500 mr-2"></i>Everything in Basic</li>
+                            <li><i class="fas fa-check text-purple-500 mr-2"></i>1-on-1 Mentoring</li>
+                            <li><i class="fas fa-check text-purple-500 mr-2"></i>Advanced Robotics</li>
+                            <li><i class="fas fa-check text-purple-500 mr-2"></i>Portfolio Building</li>
+                            <li><i class="fas fa-check text-purple-500 mr-2"></i>Priority Support</li>
+                        </ul>
+                        <button class="w-full bg-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-purple-600 transition">
+                            Go Premium
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Header -->
+            <div class="student-gradient rounded-2xl p-8 mb-8 text-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Welcome back, <span id="studentName">Student</span>!</h1>
+                        <p class="text-pink-100">Ready for another coding adventure?</p>
+                    </div>
+                    <button onclick="openCodingLab()" class="bg-white text-pink-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                        <i class="fas fa-laptop-code mr-2"></i>Open Lab
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">12</div>
+                    <div class="text-gray-600">Lessons Completed</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">5</div>
+                    <div class="text-gray-600">Projects Built</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">8</div>
+                    <div class="text-gray-600">Badges Earned</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">45</div>
+                    <div class="text-gray-600">Hours Coded</div>
+                </div>
+            </div>
+
+            <!-- Learning Content -->
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Continue Learning -->
+                <div class="lg:col-span-2">
+                    <div class="dashboard-card">
+                        <h2 class="text-xl font-bold mb-4">Continue Learning</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white mr-4">
+                                    <i class="fas fa-puzzle-piece"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold">Block Coding Basics</h3>
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">3 of 4 lessons complete</div>
+                                </div>
+                                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                                    Continue
+                                </button>
+                            </div>
+                            
+                            <!-- Age-specific content -->
+                            <div id="littleCodersContent" class="space-y-4">
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white mr-4">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold">Robot Adventures</h3>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                        <div class="text-sm text-gray-600 mt-1">1 of 5 lessons complete</div>
+                                    </div>
+                                    <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                        Start
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white mr-4">
+                                        <i class="fas fa-microchip"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold">Micro:bit Magic</h3>
+                                        <div class="text-sm text-gray-600">Create LED patterns and games</div>
+                                    </div>
+                                    <button class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">
+                                        Explore
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements & Progress -->
+                <div class="space-y-6">
+                    <!-- Progress Overview -->
+                    <div class="dashboard-card">
+                        <h3 class="text-lg font-bold mb-4">Overall Progress</h3>
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="relative w-20 h-20">
+                                <svg class="w-full h-full progress-ring">
+                                    <circle cx="40" cy="40" r="32" stroke="#e5e7eb" stroke-width="6" fill="none"/>
+                                    <circle cx="40" cy="40" r="32" stroke="#10b981" stroke-width="6" fill="none" class="progress-ring-circle" style="stroke-dashoffset: 125.6"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-sm font-bold text-gray-800">50%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-600">Level 5 Coder</p>
+                            <p class="text-sm text-gray-500">250 XP to next level</p>
+                        </div>
+                    </div>
+
+                    <!-- Recent Achievements -->
+                    <div class="dashboard-card">
+                        <h3 class="text-lg font-bold mb-4">Latest Badges</h3>
+                        <div class="space-y-3">
+                            <div class="achievement-badge earned">🎯 First Project</div>
+                            <div class="achievement-badge earned">🔥 7-Day Streak</div>
+                            <div class="achievement-badge earned">🎨 Creative Coder</div>
+                            <div class="achievement-badge">🚀 Speed Builder</div>
+                            <div class="achievement-badge">🧠 Logic Master</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Header -->
+            <div class="teacher-gradient rounded-2xl p-8 mb-8 text-gray-800">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Teacher Dashboard</h1>
+                        <p class="text-gray-700">Manage your students and create amazing courses</p>
+                    </div>
+                    <button onclick="openAICourseGenerator()" class="bg-white text-teal-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                        <i class="fas fa-magic mr-2"></i>AI Course Generator
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">24</div>
+                    <div class="text-gray-600">Active Students</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">8</div>
+                    <div class="text-gray-600">Courses Created</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">156</div>
+                    <div class="text-gray-600">Assignments Graded</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">95%</div>
+                    <div class="text-gray-600">Avg Completion</div>
+                </div>
+            </div>
+
+            <!-- Teacher Tools -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Student Management -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4">Student Management</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3">
+                                    A
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Alice Johnson</div>
+                                    <div class="text-sm text-gray-600">Level 3 • 85% Progress</div>
+                                </div>
+                            </div>
+                            <div class="text-green-600">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3">
+                                    B
+                                </div>
+                                <div>
+                                    <div class="font-semibold">Bob Smith</div>
+                                    <div class="text-sm text-gray-600">Level 2 • 65% Progress</div>
+                                </div>
+                            </div>
+                            <div class="text-yellow-600">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                            View All Students
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Course Management -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4">Course Management</h2>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <div class="font-semibold">Introduction to Scratch</div>
+                            <div class="text-sm text-gray-600 mb-2">12 students enrolled</div>
+                            <div class="flex space-x-2">
+                                <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition">Edit</button>
+                                <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">View</button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <div class="font-semibold">Python Basics</div>
+                            <div class="text-sm text-gray-600 mb-2">8 students enrolled</div>
+                            <div class="flex space-x-2">
+                                <button class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition">Edit</button>
+                                <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">View</button>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-600 transition">
+                            Create New Course
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Dashboard -->
+    <div id="parentDashboard" class="hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Header -->
+            <div class="parent-gradient rounded-2xl p-8 mb-8 text-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Parent Dashboard</h1>
+                        <p class="text-purple-100">Track <span id="childNameDisplay">your child's</span> coding journey</p>
+                    </div>
+                    <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                        <i class="fas fa-download mr-2"></i>Progress Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Child Progress Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">15</div>
+                    <div class="text-gray-600">Lessons Completed</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">7</div>
+                    <div class="text-gray-600">Projects Built</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">52</div>
+                    <div class="text-gray-600">Hours Learned</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">Level 4</div>
+                    <div class="text-gray-600">Current Level</div>
+                </div>
+            </div>
+
+            <!-- Child's Learning Activity -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Recent Projects -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4">Recent Projects</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold">Catch the Star Game</h3>
+                                <div class="text-sm text-gray-600">Completed 2 days ago</div>
+                            </div>
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">
+                                View
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold">Dancing Robot</h3>
+                                <div class="text-sm text-gray-600">Completed 5 days ago</div>
+                            </div>
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Progress Chart -->
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4">Weekly Progress</h2>
+                    <canvas id="progressChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Learning Insights -->
+            <div class="mt-8">
+                <div class="dashboard-card">
+                    <h2 class="text-xl font-bold mb-4">Learning Insights</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600 mb-2">85%</div>
+                            <div class="text-gray-600">Lesson Completion Rate</div>
+                            <div class="text-sm text-gray-500 mt-1">Above average!</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600 mb-2">12</div>
+                            <div class="text-gray-600">Day Learning Streak</div>
+                            <div class="text-sm text-gray-500 mt-1">Great consistency!</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600 mb-2">Logic</div>
+                            <div class="text-gray-600">Strongest Skill</div>
+                            <div class="text-sm text-gray-500 mt-1">Excellent problem solving!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coding Lab Modal -->
+    <div id="codingLabModal" class="modal">
+        <div class="modal-content" style="max-width: 95%; max-height: 95%;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Coding Lab</h2>
+                <button onclick="closeCodingLab()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Editor Tabs -->
+            <div class="editor-tabs">
+                <div class="editor-tab active" onclick="switchTab('blocks')">
+                    <i class="fas fa-puzzle-piece mr-2"></i>Blocks
+                </div>
+                <div class="editor-tab" onclick="switchTab('code')">
+                    <i class="fas fa-code mr-2"></i>Code
+                </div>
+                <div id="microbitTab" class="editor-tab hidden" onclick="switchTab('microbit')">
+                    <i class="fas fa-microchip mr-2"></i>Micro:bit
+                </div>
+            </div>
+
+            <!-- Editor Content -->
+            <div class="bg-white rounded-b-lg min-h-96">
+                <!-- Blockly Editor -->
+                <div id="blocksEditor" class="editor-content">
+                    <div class="blockly-container"></div>
+                </div>
+
+                <!-- Code Editor -->
+                <div id="codeEditor" class="editor-content hidden">
+                    <div class="monaco-container"></div>
+                </div>
+
+                <!-- Micro:bit Editor -->
+                <div id="microbitEditor" class="editor-content hidden">
+                    <div class="grid lg:grid-cols-3 gap-6 p-6">
+                        <!-- Micro:bit Blocks -->
+                        <div class="lg:col-span-2">
+                            <h3 class="font-bold mb-4">Drag blocks to create your program:</h3>
+                            <div class="space-y-4">
+                                <!-- Basic Blocks -->
+                                <div class="bg-blue-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-blue-800 mb-2">Basic</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <div class="bg-blue-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-blue-600 transition">
+                                            Show Icon
+                                        </div>
+                                        <div class="bg-blue-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-blue-600 transition">
+                                            Show String
+                                        </div>
+                                        <div class="bg-blue-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-blue-600 transition">
+                                            Clear Screen
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Input Blocks -->
+                                <div class="bg-green-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-green-800 mb-2">Input</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <div class="bg-green-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-green-600 transition">
+                                            On Button A
+                                        </div>
+                                        <div class="bg-green-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-green-600 transition">
+                                            On Button B
+                                        </div>
+                                        <div class="bg-green-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-green-600 transition">
+                                            On Shake
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LED Blocks -->
+                                <div class="bg-purple-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-purple-800 mb-2">LED</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <div class="bg-purple-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-purple-600 transition">
+                                            Turn On LED
+                                        </div>
+                                        <div class="bg-purple-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-purple-600 transition">
+                                            Turn Off LED
+                                        </div>
+                                        <div class="bg-purple-500 text-white px-3 py-2 rounded cursor-pointer hover:bg-purple-600 transition">
+                                            Plot Pattern
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Program Workspace -->
+                            <div class="mt-6">
+                                <h4 class="font-bold mb-2">Your Program:</h4>
+                                <div class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 min-h-32">
+                                    <p class="text-gray-500 text-center">Drag blocks here to build your program</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Micro:bit Simulator -->
+                        <div>
+                            <div class="microbit-simulator">
+                                <h3 class="text-lg font-bold mb-4">Micro:bit Simulator</h3>
+                                
+                                <!-- LED Matrix -->
+                                <div class="led-grid">
+                                    <!-- Generate 25 LEDs (5x5 grid) -->
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                    <div class="led" onclick="toggleLED(this)"></div>
+                                </div>
+
+                                <!-- Control Buttons -->
+                                <div class="flex justify-center space-x-4 mb-4">
+                                    <button id="buttonA" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-bold transition" onclick="pressButton('A')">
+                                        A
+                                    </button>
+                                    <button id="buttonB" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-bold transition" onclick="pressButton('B')">
+                                        B
+                                    </button>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="space-y-2">
+                                    <button onclick="runProgram()" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition">
+                                        <i class="fas fa-play mr-2"></i>Run
+                                    </button>
+                                    <button onclick="downloadHex()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
+                                        <i class="fas fa-download mr-2"></i>Download .hex
+                                    </button>
+                                </div>
+
+                                <!-- Console Output -->
+                                <div class="mt-4">
+                                    <h4 class="text-sm font-bold mb-2">Console:</h4>
+                                    <div id="microbitConsole" class="bg-black text-green-400 p-2 rounded text-xs font-mono h-20 overflow-y-auto">
+                                        > Ready to run program...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="authTitle" class="text-2xl font-bold">Sign In</h2>
+                <button onclick="closeAuthModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition">
+                    Sign In
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="switchAuthMode('signup')" class="text-blue-500 hover:text-blue-600">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm" class="hidden space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select id="roleSelect" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select your role</option>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="parent">Parent</option>
+                    </select>
+                </div>
+
+                <!-- Student Age Group -->
+                <div id="ageGroupField" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Age Group</label>
+                    <select id="ageGroupSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="6-11">Little Coders (6-11 years)</option>
+                        <option value="12-17">Teen Coders (12-17 years)</option>
+                    </select>
+                </div>
+
+                <!-- Parent Child Name -->
+                <div id="childNameField" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Child's Name</label>
+                    <input type="text" id="childNameInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your child's name">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input type="text" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition">
+                    Sign Up Free
+                </button>
+                <div class="text-center">
+                    <button type="button" onclick="switchAuthMode('signin')" class="text-blue-500 hover:text-blue-600">
+                        Already have an account? Sign in
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global State
+        let currentUser = null;
+        let currentUserRole = null;
+        let currentAgeGroup = null;
+        
+        // TODO: Initialize Firebase and other services
+
+        // Authentication Functions
+        function openAuthModal(mode = 'signin', role = '', ageGroup = '') {
+            document.getElementById('authModal').classList.add('active');
+            if (mode === 'signup') {
+                switchAuthMode('signup');
+                if (role) {
+                    document.getElementById('roleSelect').value = role;
+                    handleRoleChange();
+                }
+                if (ageGroup) {
+                    document.getElementById('ageGroupSelect').value = ageGroup;
+                }
+            } else {
+                switchAuthMode('signin');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchAuthMode(mode) {
+            const signinForm = document.getElementById('signinForm');
+            const signupForm = document.getElementById('signupForm');
+            const authTitle = document.getElementById('authTitle');
+            
+            if (mode === 'signup') {
+                signinForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                authTitle.textContent = 'Sign Up';
+            } else {
+                signupForm.classList.add('hidden');
+                signinForm.classList.remove('hidden');
+                authTitle.textContent = 'Sign In';
+            }
+        }
+
+        // Role selection handler
+        document.getElementById('roleSelect').addEventListener('change', handleRoleChange);
+
+        function handleRoleChange() {
+            const role = document.getElementById('roleSelect').value;
+            const ageGroupField = document.getElementById('ageGroupField');
+            const childNameField = document.getElementById('childNameField');
+            
+            if (role === 'student') {
+                ageGroupField.classList.remove('hidden');
+                childNameField.classList.add('hidden');
+            } else if (role === 'parent') {
+                ageGroupField.classList.add('hidden');
+                childNameField.classList.remove('hidden');
+            } else {
+                ageGroupField.classList.add('hidden');
+                childNameField.classList.add('hidden');
+            }
+        }
+
+        // Form Submissions
+        document.getElementById('signinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // TODO: Implement actual sign in logic
+            simulateSignIn('student', '6-11', 'Alex');
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const role = document.getElementById('roleSelect').value;
+            const ageGroup = document.getElementById('ageGroupSelect').value;
+            const childName = document.getElementById('childNameInput').value;
+            
+            // TODO: Implement actual sign up logic
+            simulateSignIn(role, ageGroup, childName || 'User');
+        });
+
+        function simulateSignIn(role, ageGroup, name) {
+            currentUser = name;
+            currentUserRole = role;
+            currentAgeGroup = ageGroup;
+            
+            closeAuthModal();
+            showDashboard(role);
+            showNotification('Successfully signed in!', 'success');
+        }
+
+        function signOut() {
+            currentUser = null;
+            currentUserRole = null;
+            currentAgeGroup = null;
+            
+            // Hide all dashboards and show home content
+            document.getElementById('homeContent').classList.remove('hidden');
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('parentDashboard').classList.add('hidden');
+            
+            // Show public nav, hide auth nav
+            document.getElementById('publicNav').classList.remove('hidden');
+            document.getElementById('authNav').classList.add('hidden');
+            
+            showNotification('Successfully signed out!', 'info');
+        }
+
+        // Dashboard Management
+        function showDashboard(role) {
+            // Hide home content
+            document.getElementById('homeContent').classList.add('hidden');
+            
+            // Hide all dashboards first
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('parentDashboard').classList.add('hidden');
+            
+            // Show appropriate dashboard
+            if (role === 'student') {
+                document.getElementById('studentDashboard').classList.remove('hidden');
+                document.getElementById('studentName').textContent = currentUser;
+                
+                // Show age-specific content
+                if (currentAgeGroup === '6-11') {
+                    document.getElementById('littleCodersContent').classList.remove('hidden');
+                    document.getElementById('microbitTab').classList.remove('hidden');
+                } else {
+                    document.getElementById('littleCodersContent').classList.add('hidden');
+                    document.getElementById('microbitTab').classList.add('hidden');
+                }
+                
+                // Show coding lab button
+                document.getElementById('codingLabBtn').classList.remove('hidden');
+            } else if (role === 'teacher') {
+                document.getElementById('teacherDashboard').classList.remove('hidden');
+            } else if (role === 'parent') {
+                document.getElementById('parentDashboard').classList.remove('hidden');
+                document.getElementById('childNameDisplay').textContent = currentUser;
+                initializeProgressChart();
+            }
+            
+            // Update navigation
+            document.getElementById('publicNav').classList.add('hidden');
+            document.getElementById('authNav').classList.remove('hidden');
+            document.getElementById('userNameDisplay').textContent = currentUser;
+        }
+
+        // Coding Lab Functions
+        function openCodingLab() {
+            document.getElementById('codingLabModal').classList.add('active');
+            // TODO: Initialize Blockly and Monaco editors
+        }
+
+        function closeCodingLab() {
+            document.getElementById('codingLabModal').classList.remove('active');
+        }
+
+        function switchTab(tab) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.editor-content').forEach(c => c.classList.add('hidden'));
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Show corresponding content
+            if (tab === 'blocks') {
+                document.getElementById('blocksEditor').classList.remove('hidden');
+            } else if (tab === 'code') {
+                document.getElementById('codeEditor').classList.remove('hidden');
+            } else if (tab === 'microbit') {
+                document.getElementById('microbitEditor').classList.remove('hidden');
+            }
+        }
+
+        // Micro:bit Simulator Functions
+        function toggleLED(led) {
+            led.classList.toggle('active');
+        }
+
+        function pressButton(button) {
+            const buttonElement = document.getElementById(`button${button}`);
+            buttonElement.style.backgroundColor = '#dc2626';
+            setTimeout(() => {
+                buttonElement.style.backgroundColor = '#eab308';
+            }, 200);
+            
+            logToConsole(`Button ${button} pressed`);
+        }
+
+        function runProgram() {
+            logToConsole('Running program...');
+            // TODO: Implement program execution logic
+            setTimeout(() => {
+                logToConsole('Program completed successfully!');
+            }, 1000);
+        }
+
+        function downloadHex() {
+            // TODO: Generate and download .hex file
+            logToConsole('Downloading .hex file...');
+            showNotification('Program downloaded! Transfer to your micro:bit.', 'success');
+        }
+
+        function logToConsole(message) {
+            const console = document.getElementById('microbitConsole');
+            console.innerHTML += `\n> ${message}`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openAICourseGenerator() {
+            // TODO: Implement AI course generator modal
+            showNotification('AI Course Generator coming soon!', 'info');
+        }
+
+        // Progress Chart for Parent Dashboard
+        function initializeProgressChart() {
+            const ctx = document.getElementById('progressChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Lessons Completed',
+                            data: [2, 1, 3, 2, 2, 1, 3],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // User menu dropdown
+        document.getElementById('userMenuBtn').addEventListener('click', function() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const button = document.getElementById('userMenuBtn');
+            
+            if (!button.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // TODO: Check for existing authentication state
+            // TODO: Initialize Firebase
+            // TODO: Set up real-time listeners
+            
+            console.log('CodewiseHub initialized');
+        });
+    </script>
+</body>
+</html>
