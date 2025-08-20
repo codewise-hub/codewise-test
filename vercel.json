@@ -2,8 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build"
+      "src": "vite.config.vercel.ts",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
     },
     {
       "src": "api/**/*.ts",
@@ -15,11 +18,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api/server.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "$1"
+      "dest": "/dist/public/$1"
     }
   ],
   "functions": {
